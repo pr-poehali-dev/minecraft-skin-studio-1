@@ -52,6 +52,8 @@ type Worker = { nick: string; password: string; role: string };
 const INITIAL_ORDERS: Order[] = [
   { id: 1001, nick: "Артём_228", product: "Кастомный скин", description: "Воин в красных доспехах с мечом", deadline: "3 дня", tg: "@artem", ds: "artem#1234", vk: "vk.com/artem", status: "В работе", createdAt: "18 апр 2026" },
   { id: 1002, nick: "Mira", product: "Комплект скинов", description: "Комплект для клана, 4 скина в тёмном стиле", deadline: "7 дней", tg: "@mira_k", ds: "mira#0001", vk: "", status: "Новая", createdAt: "19 апр 2026" },
+  { id: 999, nick: "Дэн_1337", product: "Ребрендинг", description: "Переделать старый скин в тёмном стиле", deadline: "2 дня", tg: "@den1337", ds: "", vk: "", status: "Готово", createdAt: "28 мар 2026" },
+  { id: 998, nick: "Vortex", product: "Простой скин", description: "Базовый скин мага", deadline: "1 день", tg: "@vortex", ds: "vortex#5555", vk: "", status: "Готово", createdAt: "20 мар 2026" },
 ];
 
 const INITIAL_WORKERS: Worker[] = [
@@ -84,7 +86,7 @@ const Index = () => {
 
   const [newWorkerNick, setNewWorkerNick] = useState("");
   const [newWorkerPass, setNewWorkerPass] = useState("");
-  const [adminTab, setAdminTab] = useState<"orders" | "workers">("orders");
+  const [adminTab, setAdminTab] = useState<"orders" | "archive" | "workers">("orders");
 
   // Chat
   const [chatMessages, setChatMessages] = useState<{ from: "client" | "master"; text: string; time: string }[]>([
@@ -100,12 +102,9 @@ const Index = () => {
 
   const navItems: { id: Section; label: string }[] = [
     { id: "home", label: "Главная" },
-    { id: "catalog", label: "Каталог" },
     { id: "services", label: "Услуги" },
     { id: "reviews", label: "Отзывы" },
     { id: "about", label: "О студии" },
-    { id: "blog", label: "Блог" },
-    { id: "contacts", label: "Контакты" },
   ];
 
   const styles = ["Все", "Нео", "Тёмный", "Кубо"];
@@ -369,93 +368,6 @@ const Index = () => {
           </div>
         )}
 
-        {/* CATALOG */}
-        {activeSection === "catalog" && (
-          <section className="py-12 px-4 md:px-8">
-            <div className="max-w-[1600px] mx-auto">
-              <div className="mb-10">
-                <div className="text-xs text-neon-green uppercase tracking-widest mb-2">// Коллекция</div>
-                <h2 className="section-title">КАТАЛОГ <span className="neon-text">СКИНОВ</span></h2>
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-4 mb-10 p-5 border border-border bg-card">
-                <div>
-                  <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Стиль</div>
-                  <div className="flex flex-wrap gap-2">
-                    {styles.map((s) => (
-                      <button key={s} onClick={() => setFilterStyle(s)} className={`px-3 py-1 text-xs uppercase tracking-wider border transition-all ${filterStyle === s ? "bg-neon-green text-background border-neon-green" : "border-border text-muted-foreground hover:border-neon-green/50"}`}>
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Категория</div>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((c) => (
-                      <button key={c} onClick={() => setFilterCat(c)} className={`px-3 py-1 text-xs uppercase tracking-wider border transition-all ${filterCat === c ? "bg-neon-purple text-white border-neon-purple" : "border-border text-muted-foreground hover:border-neon-purple/50"}`}>
-                        {c}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Цена</div>
-                  <div className="flex flex-wrap gap-2">
-                    {prices.map((p) => (
-                      <button key={p} onClick={() => setFilterPrice(p)} className={`px-3 py-1 text-xs uppercase tracking-wider border transition-all ${filterPrice === p ? "bg-neon-yellow text-background border-neon-yellow" : "border-border text-muted-foreground hover:border-neon-yellow/50"}`}>
-                        {p}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {filteredSkins.length === 0 ? (
-                <div className="text-center py-20 text-muted-foreground">
-                  <Icon name="SearchX" size={40} className="mx-auto mb-4 opacity-30" />
-                  <div className="font-russo text-lg uppercase">Ничего не найдено</div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {filteredSkins.map((skin, i) => (
-                    <div key={skin.id} className="cube-card bg-card overflow-hidden group animate-fade-in-up opacity-0" style={{ animationDelay: `${i * 0.08}s`, animationFillMode: "forwards" }}>
-                      <div className="relative overflow-hidden aspect-square">
-                        <img src={skin.image} alt={skin.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                        {skin.tag && (
-                          <div className={`absolute top-3 left-3 px-2 py-1 text-xs font-russo uppercase tracking-wider ${
-                            skin.tag === "ХИТ" ? "bg-neon-yellow text-background" :
-                            skin.tag === "НОВИНКА" ? "bg-neon-green text-background" :
-                            skin.tag === "ПРОСТОЙ" ? "bg-neon-cyan text-background" :
-                            "bg-neon-purple text-white"
-                          }`}>
-                            {skin.tag}
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <button onClick={() => scrollTo("order")} className="cube-btn bg-neon-green text-background px-6 py-2 text-sm">
-                            Заказать
-                          </button>
-                        </div>
-                      </div>
-                      <div className="p-4">
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="font-russo text-sm uppercase tracking-wide">{skin.name}</div>
-                          <div className="font-russo text-lg neon-text">{skin.price} ₽</div>
-                        </div>
-                        <div className="flex gap-2">
-                          <span className="text-xs text-muted-foreground border border-border px-2 py-0.5">{skin.category}</span>
-                          <span className="text-xs text-muted-foreground border border-border px-2 py-0.5">{skin.style}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </section>
-        )}
-
         {/* SERVICES */}
         {activeSection === "services" && (
           <section className="py-12 px-4 md:px-8">
@@ -623,75 +535,6 @@ const Index = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* BLOG */}
-        {activeSection === "blog" && (
-          <section className="py-12 px-4 md:px-8">
-            <div className="max-w-[1600px] mx-auto">
-              <div className="mb-10">
-                <div className="text-xs text-neon-green uppercase tracking-widest mb-2">// Наши материалы</div>
-                <h2 className="section-title">БЛОГ <span className="neon-text">СТУДИИ</span></h2>
-              </div>
-              <div className="grid md:grid-cols-3 gap-6">
-                {BLOG_POSTS.map((post, i) => (
-                  <div key={post.title} className="cube-card bg-card overflow-hidden group cursor-pointer animate-fade-in-up opacity-0" style={{ animationDelay: `${i * 0.1}s`, animationFillMode: "forwards" }}>
-                    <div className="h-40 bg-muted relative overflow-hidden">
-                      <img src={SKIN_IMAGE} alt="" className="w-full h-full object-cover opacity-50 group-hover:opacity-70 transition-opacity group-hover:scale-105 duration-500" />
-                      <div className="absolute top-3 left-3 bg-neon-green text-background text-xs font-russo px-2 py-1 uppercase">{post.tag}</div>
-                    </div>
-                    <div className="p-5">
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
-                        <span>{post.date}</span>
-                        <span className="w-1 h-1 bg-muted-foreground rounded-full" />
-                        <Icon name="Eye" size={12} />
-                        <span>{post.reads}</span>
-                      </div>
-                      <h3 className="font-russo text-sm uppercase leading-snug group-hover:text-neon-green transition-colors">{post.title}</h3>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* CONTACTS */}
-        {activeSection === "contacts" && (
-          <section className="py-12 px-4 md:px-8">
-            <div className="max-w-[1600px] mx-auto">
-              <div className="mb-10">
-                <div className="text-xs text-neon-green uppercase tracking-widest mb-2">// Напиши нам</div>
-                <h2 className="section-title">КОН<span className="neon-text">ТАКТЫ</span></h2>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6 mb-10">
-                {[
-                  { icon: "Send", label: "Telegram", val: "@Xezze228", link: "https://t.me/Xezze228" },
-                  { icon: "MessageSquare", label: "Discord", val: "@xezze228", link: "#" },
-                ].map((c) => (
-                  <a key={c.label} href={c.link} target="_blank" rel="noreferrer" className="cube-card bg-card p-6 flex items-center gap-4 hover:border-neon-green/60 transition-colors">
-                    <div className="w-14 h-14 border-2 border-neon-green/30 flex items-center justify-center flex-shrink-0">
-                      <Icon name={c.icon} size={24} className="text-neon-green" />
-                    </div>
-                    <div>
-                      <div className="text-xs text-muted-foreground uppercase tracking-wider">{c.label}</div>
-                      <div className="font-russo text-lg neon-text mt-1">{c.val}</div>
-                    </div>
-                  </a>
-                ))}
-              </div>
-
-              <div className="cube-card bg-card p-8 text-center">
-                <Icon name="MessageCircle" size={40} className="mx-auto text-neon-green mb-4" />
-                <div className="font-russo text-2xl uppercase mb-3">Чат со <span className="neon-text">скиноделом</span></div>
-                <p className="text-muted-foreground mb-6 max-w-md mx-auto">Задай вопрос напрямую Виктору или обсуди заказ в реальном времени.</p>
-                <button onClick={() => scrollTo("chat")} className="cube-btn bg-neon-green text-background px-8 py-3 text-sm">
-                  Открыть чат
-                </button>
               </div>
             </div>
           </section>
@@ -866,9 +709,12 @@ const Index = () => {
                 </div>
               </div>
 
-              <div className="flex gap-2 mb-6 border-b border-border">
+              <div className="flex gap-2 mb-6 border-b border-border flex-wrap">
                 <button onClick={() => setAdminTab("orders")} className={`px-4 py-3 text-xs uppercase tracking-wider border-b-2 ${adminTab === "orders" ? "border-neon-green text-neon-green" : "border-transparent text-muted-foreground"}`}>
-                  Заказы
+                  Заказы ({orders.filter((o) => o.status !== "Готово").length})
+                </button>
+                <button onClick={() => setAdminTab("archive")} className={`px-4 py-3 text-xs uppercase tracking-wider border-b-2 ${adminTab === "archive" ? "border-neon-green text-neon-green" : "border-transparent text-muted-foreground"}`}>
+                  Архив ({orders.filter((o) => o.status === "Готово").length})
                 </button>
                 <button onClick={() => setAdminTab("workers")} className={`px-4 py-3 text-xs uppercase tracking-wider border-b-2 ${adminTab === "workers" ? "border-neon-green text-neon-green" : "border-transparent text-muted-foreground"}`}>
                   Работники
@@ -877,8 +723,8 @@ const Index = () => {
 
               {adminTab === "orders" && (
                 <div className="space-y-3">
-                  {orders.length === 0 && <div className="text-center py-10 text-muted-foreground">Заказов пока нет</div>}
-                  {orders.map((o) => (
+                  {orders.filter((o) => o.status !== "Готово").length === 0 && <div className="text-center py-10 text-muted-foreground">Активных заказов нет</div>}
+                  {orders.filter((o) => o.status !== "Готово").map((o) => (
                     <div key={o.id} className="cube-card bg-card p-5">
                       <div className="flex items-start justify-between gap-4 flex-wrap">
                         <div className="flex-1 min-w-[200px]">
@@ -908,6 +754,41 @@ const Index = () => {
                             <option>Готово</option>
                           </select>
                         </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {adminTab === "archive" && (
+                <div className="space-y-3">
+                  <div className="border border-neon-green/20 bg-neon-green/5 p-4 mb-4 text-xs text-muted-foreground flex items-center gap-2">
+                    <Icon name="Archive" size={16} className="text-neon-green" />
+                    Здесь все выполненные заказы. Переписка чата скрыта.
+                  </div>
+                  {orders.filter((o) => o.status === "Готово").length === 0 && <div className="text-center py-10 text-muted-foreground">В архиве пусто — выполненных заказов пока нет</div>}
+                  {orders.filter((o) => o.status === "Готово").map((o) => (
+                    <div key={o.id} className="cube-card bg-card p-5 opacity-90">
+                      <div className="flex items-start justify-between gap-4 flex-wrap">
+                        <div className="flex-1 min-w-[200px]">
+                          <div className="flex items-center gap-3 mb-2 flex-wrap">
+                            <div className="font-russo text-sm uppercase">#{o.id}</div>
+                            <div className="font-russo text-sm neon-text">{o.nick}</div>
+                            <span className="text-xs px-2 py-1 uppercase tracking-wider bg-neon-green text-background">Готово</span>
+                          </div>
+                          <div className="text-xs text-muted-foreground mb-1">{o.createdAt}</div>
+                          <div className="text-sm font-medium mb-2">{o.product}</div>
+                          {o.description && <div className="text-xs text-muted-foreground mb-2">{o.description}</div>}
+                          {o.deadline && <div className="text-xs text-muted-foreground">Срок: {o.deadline}</div>}
+                          <div className="flex flex-wrap gap-3 mt-3 text-xs">
+                            {o.tg && <span className="text-neon-green">TG: {o.tg}</span>}
+                            {o.ds && <span className="text-neon-purple">DS: {o.ds}</span>}
+                            {o.vk && <span className="text-neon-cyan">VK: {o.vk}</span>}
+                          </div>
+                        </div>
+                        <button onClick={() => changeOrderStatus(o.id, "В работе")} className="text-xs uppercase tracking-wider border border-border px-3 py-2 hover:border-neon-yellow hover:text-neon-yellow transition-colors">
+                          Вернуть в работу
+                        </button>
                       </div>
                     </div>
                   ))}
